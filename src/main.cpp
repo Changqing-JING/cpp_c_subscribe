@@ -16,11 +16,13 @@ extern "C"{
 void subscribe_proxy(int num, void* p);
 
 unsigned char bridge[] = {   0x53 ,                     //push   rbx
-     0x48, 0xb8, 0x88, 0x77, 0x66, 0x55, 0x44,   // movabs rax,0x1223334455667788
-      0x33, 0x23, 0x12,
+         0x56,                      //push   rsi
+     0x48, 0xb8, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,  // movabs rax,0x1122334455667788
+      
       0x48, 0x8b, 0x18,                //mov    rbx,QWORD PTR [rax]
        0x48, 0x8b, 0x70, 0x08,            // mov    rsi,QWORD PTR [rax+0x8]
      0xff, 0xd3,                  // call   rbx
+     0x5e,                     // pop    rsi
      0x5b,                      //pop    rbx
      0xc3                      //ret 
      };
@@ -54,7 +56,7 @@ class C1{
         void gerertion_function(){
             this->tf = (TF)allocExecutableMemory(4096);
             memcpy((void*)this->tf, bridge, sizeof(bridge));
-            char* address_holder = (char*)this->tf + 3;
+            char* address_holder = (char*)this->tf + 4;
             *((uintptr_t*)address_holder) = (uintptr_t)this->abi_area;
 
             abi_area[0] = (void*)&subscribe_proxy;

@@ -19,8 +19,7 @@ unsigned char bridge[] = {   0x53 ,                     //push   rbx
      0x48, 0xb8, 0x88, 0x77, 0x66, 0x55, 0x44,   // movabs rax,0x1223334455667788
       0x33, 0x23, 0x12,
       0x48, 0x8b, 0x18,                //mov    rbx,QWORD PTR [rax]
-      0x48, 0x83, 0xc0, 0x08,             //add    rax,0x8
-     0x48, 0x8b, 0x30,               // mov    rsi,QWORD PTR [rax]
+       0x48, 0x8b, 0x70, 0x08,            // mov    rsi,QWORD PTR [rax+0x8]
      0xff, 0xd3,                  // call   rbx
      0x5b,                      //pop    rbx
      0xc3                      //ret 
@@ -50,7 +49,7 @@ class C1{
 
         
     private:
-        unsigned char abi_area[2*sizeof(void*)];
+        void* abi_area[2];
 
         void gerertion_function(){
             this->tf = (TF)allocExecutableMemory(4096);
@@ -58,14 +57,8 @@ class C1{
             char* address_holder = (char*)this->tf + 3;
             *((uintptr_t*)address_holder) = (uintptr_t)this->abi_area;
 
-            void* func_ptr = (void*)&subscribe_proxy;
-            void* address_for_func = &this->abi_area;
-            *((uintptr_t*)address_for_func) = (uintptr_t)func_ptr;
-
-            void* address_for_this = ((unsigned char*)&this->abi_area) + sizeof(void*);
-
-            *((uintptr_t*)address_for_this) = (uintptr_t)this;
-            
+            abi_area[0] = (void*)&subscribe_proxy;
+            abi_area[1] = this;          
         }
 
         TF tf;

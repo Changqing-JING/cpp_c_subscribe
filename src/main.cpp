@@ -7,6 +7,12 @@ extern "C"{
     #include "lib.h"
 }
 
+#if ! __unix__
+
+#error "Unsupported OS"
+
+#endif
+
 void subscribe_proxy(int num, void* p);
 
 unsigned char bridge[] = {   0x53 ,                     //push   rbx
@@ -24,7 +30,7 @@ class C1{
     public:
         C1(int a){
             this->a = a;
-            build_function();
+            gerertion_function();
         }
 
         ~C1(){
@@ -37,13 +43,7 @@ class C1{
         }
 
         void subscribe_to_c_lib(){
-            void* func_ptr = (void*)&subscribe_proxy;
-            void* address_for_func = &this->abi_area;
-            *((uintptr_t*)address_for_func) = (uintptr_t)func_ptr;
-
-            void* address_for_this = ((unsigned char*)&this->abi_area) + sizeof(void*);
-
-            *((uintptr_t*)address_for_this) = (uintptr_t)this;
+            
             subscribe(this->tf);
 
         }
@@ -52,11 +52,19 @@ class C1{
     private:
         unsigned char abi_area[2*sizeof(void*)];
 
-        void build_function(){
+        void gerertion_function(){
             this->tf = (TF)allocExecutableMemory(4096);
             memcpy((void*)this->tf, bridge, sizeof(bridge));
             char* address_holder = (char*)this->tf + 3;
             *((uintptr_t*)address_holder) = (uintptr_t)this->abi_area;
+
+            void* func_ptr = (void*)&subscribe_proxy;
+            void* address_for_func = &this->abi_area;
+            *((uintptr_t*)address_for_func) = (uintptr_t)func_ptr;
+
+            void* address_for_this = ((unsigned char*)&this->abi_area) + sizeof(void*);
+
+            *((uintptr_t*)address_for_this) = (uintptr_t)this;
             
         }
 

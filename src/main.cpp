@@ -21,7 +21,9 @@ unsigned char bridge[] = {   0x53 ,                     //push   rbx
       
       0x48, 0x8b, 0x18,                //mov    rbx,QWORD PTR [rax]
        0x48, 0x8b, 0x70, 0x08,            // mov    rsi,QWORD PTR [rax+0x8]
+       0x48, 0x83, 0xec, 0x08,             //sub    rsp,0x8
      0xff, 0xd3,                  // call   rbx
+     0x48, 0x83, 0xc4, 0x08,      //       add    rsp,0x8
      0x5e,                     // pop    rsi
      0x5b,                      //pop    rbx
      0xc3                      //ret 

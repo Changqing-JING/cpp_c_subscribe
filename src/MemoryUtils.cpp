@@ -5,14 +5,13 @@
 #include <exception>
 #include <memory.h>
 #include <algorithm>
-#include <malloc.h>
 
 #include "MemoryUtils.hpp"
 
 static int addExecuteAccess(uint8_t* codeStart, size_t len);
 static void* allocAlignedMemory(size_t alignment, size_t size);
 
-#if __unix__
+#if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
 #include <sys/mman.h>
 
@@ -35,11 +34,27 @@ size_t getMemoryPageSize() {
     return pageSize;
 }
 
+#if __cplusplus >= 201703L && defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
 
 static void* allocAlignedMemory(size_t alignment, size_t size) {
 
     return (uint8_t*)std::aligned_alloc(alignment, size);
 }
+
+#else
+static void* allocAlignedMemory(size_t alignment, size_t size) {
+    void* buffer;
+    int error = posix_memalign((void **)&buffer, alignment, size);
+    
+    if(!error){
+        return buffer;
+    }else{
+        printf("posix_memalign Failed with error number %d\n", error);
+        return NULL;
+    }
+}
+
+#endif
 
 void freeAlignedMemroy(void* ptr) {
 

@@ -7,8 +7,8 @@ extern "C"{
     #include "lib.h"
 }
 
-#if ! __unix__
-
+#if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
+#else
 #error "Unsupported OS"
 
 #endif

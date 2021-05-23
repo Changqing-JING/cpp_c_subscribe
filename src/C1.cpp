@@ -4,22 +4,10 @@
 
 
 #include "C1.h"
-#include "MemoryUtils.hpp"
+
 #include "CCPPProxy.h"
 
-C1::APIFunction::APIFunction(){
-    this->func =  allocExecutableMemory(sizeof(bridge)); //fixme, use executeableHeap
-    memcpy(this->func, bridge, sizeof(bridge));
 
-    char* address_holder = (char*)this->func + abiOffset;
-    *((uintptr_t*)address_holder) = (uintptr_t)&abi_area;
-}
-
-C1::APIFunction::~APIFunction(){
-    if(this->func){
-        freeAlignedMemroy((void*)this->func); 
-    }
-}
 
 C1::C1(int a)
 {

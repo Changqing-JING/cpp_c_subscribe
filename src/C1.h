@@ -2,6 +2,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include "APIFunction.h"
 
 extern "C"{
     #include "lib.h"
@@ -11,12 +12,7 @@ extern "C"{
 
 
 class C1{
-    struct APIFunction{
-        void* func;
-        std::array<void*, 2> abi_area;
-        APIFunction();
-        ~APIFunction();
-    };
+    
     public:
         C1(int a);
 

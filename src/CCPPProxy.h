@@ -1,15 +1,6 @@
 #pragma once
+#include "CPUAdapter.h"
 
-
-constexpr unsigned char bridge[] = {                    //push   rsi
-    0x48, 0xb8, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11,  // movabs rax,0x1122334455667788
-    
-    0x4c, 0x8b, 0x78, 0x08,            // mov    r15,QWORD PTR [rax+0x8]
-    0xff, 0x10,                  // call   QWORD PTR [rax]
-    0xc3                      //ret 
-    };
-
-constexpr int abiOffset = 2;
 
 template<typename ClassName, typename ReturnType, typename ...FunctionArgumensts>
 struct ClassMemberFuctionBind{
@@ -19,19 +10,31 @@ struct ClassMemberFuctionBind{
     */
     template<  ReturnType (C1::*function_ptr)(FunctionArgumensts ...args)>
     static ReturnType call(FunctionArgumensts ...args){
-    void* pC1;;
+    void* pointer;;
 
     #ifdef __GNUC__
-        __asm__(
-            "mov %%r15, %0":"=r"(pC1)
-        );
+        #ifdef x64
+            __asm__(
+                "mov %%r15, %0":"=r"(pointer)
+            );
+        #elif arm64
+            __asm__(
+                "mov x15, %0":"=r"(pointer)
+            );
+        #endif
     #elif defined _MSC_VER && defined __clang__
-        __asm {mov[pC1], r15 }
+        #ifdef x64
+            __asm {mov[pointer], r15 }
+        #elif arm64
+            __asm__(
+                "mov x15, %0":"=r"(pointer)
+            );
+        #endif
     #else
         #error "unsupported compiler"
     #endif
     
-    return (((ClassName*)pC1)->*function_ptr)(args...);
+    return (((ClassName*)pointer)->*function_ptr)(args...);
     }
 
    

@@ -7,41 +7,59 @@
 #include "MemoryUtils.hpp"
 #include "CCPPProxy.h"
 
+C1::APIFunction::APIFunction(){
+    this->func =  allocExecutableMemory(sizeof(bridge)); //fixme, use executeableHeap
+    memcpy(this->func, bridge, sizeof(bridge));
 
+    char* address_holder = (char*)this->func + abiOffset;
+    *((uintptr_t*)address_holder) = (uintptr_t)&abi_area;
+}
 
-
-
+C1::APIFunction::~APIFunction(){
+    if(this->func){
+        freeAlignedMemroy((void*)this->func); 
+    }
+}
 
 C1::C1(int a)
-    {
-            this->a = a;
-            gerertion_function();
-    }
+{
+    this->a = a;
+    
+}
 
-C1::~C1(){
-     
-            freeAlignedMemroy((void*)this->tf);
-      
+C1::~C1(){ 
+    
+   
 }
 
 
 void C1::sub_foo(int input){
-            int result = this->a + input;
-            printf("result is %d\n", result);
-        }
-
-void C1::subscribe_to_c_lib(){
-    
-    subscribe(this->tf);
-
+    int result = this->a + input;
+    printf("result is %d\n", result);
 }
 
-void C1::gerertion_function(){
-            this->tf = (TF)allocExecutableMemory(4096);
-            memcpy((void*)this->tf, bridge, sizeof(bridge));
-            char* address_holder = (char*)this->tf + 2;
-            *((uintptr_t*)address_holder) = (uintptr_t)this->abi_area;           
+int C1::sub_foo2(int input1, int input2){
+    
+    printf("result is %d, %d, %d\n", this->a, input1, input2);
+    return input1 + input2;
+}
 
-            abi_area[0] = (void*)&(CCPPProxy<void, int>::call<&C1::sub_foo>);
-            abi_area[1] = this;          
+void C1::subscribe_to_c_lib(){
+
+    void* tf = gerertion_function( (void*)&(CCPPProxy<void, int>::call<&C1::sub_foo>));
+    void* tf2 = gerertion_function((void*)&(CCPPProxy<int, int , int>::call<&C1::sub_foo2>));
+    
+    subscribe(tf);
+    subscribe2(tf2);
+}
+
+void* C1::gerertion_function( void* bridgeFunction){
+     
+    apiFunctions.push_back(std::unique_ptr<APIFunction>(new APIFunction()));
+    std::unique_ptr<APIFunction>& apiFunction = apiFunctions.back();
+
+    apiFunction->abi_area = {bridgeFunction, (void*)this};
+    
+    return apiFunction->func;        
+       
 }

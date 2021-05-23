@@ -9,6 +9,8 @@ constexpr unsigned char bridge[] = {                    //push   rsi
     0xc3                      //ret 
     };
 
+constexpr int abiOffset = 2;
+
 class C1;
 
 template<typename ReturnType, typename ...FunctionArgumensts>

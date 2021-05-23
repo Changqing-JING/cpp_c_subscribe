@@ -11,13 +11,15 @@ constexpr unsigned char bridge[] = {                    //push   rsi
 
 constexpr int abiOffset = 2;
 
-class C1;
-
-template<typename ReturnType, typename ...FunctionArgumensts>
-struct CCPPProxy{
+template<typename ClassName, typename ReturnType, typename ...FunctionArgumensts>
+struct ClassMemberFuctionBind{
+    /*
+        This Function uses r15 register on x86_64 to pass argument with assembly code in bridge.
+        Every .cpp file which includes this header file must be compiled with argument -ffixed-r15, otherwise the r15 register maybe get corrupt.
+    */
     template<  ReturnType (C1::*function_ptr)(FunctionArgumensts ...args)>
     static ReturnType call(FunctionArgumensts ...args){
-    C1* pC1;;
+    void* pC1;;
 
     #ifdef __GNUC__
         __asm__(
@@ -29,7 +31,7 @@ struct CCPPProxy{
         #error "unsupported compiler"
     #endif
     
-    return (pC1->*function_ptr)(args...);
+    return (((ClassName*)pC1)->*function_ptr)(args...);
     }
 
    

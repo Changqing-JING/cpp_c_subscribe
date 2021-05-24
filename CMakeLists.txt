@@ -4,15 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 aux_source_directory(src SourceFiles)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+add_library(${PROJECT_NAME} STATIC ${SourceFiles})
+target_include_directories(${PROJECT_NAME} PUBLIC src)
 
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/src/C1.cpp PROPERTIES COMPILE_FLAGS -ffixed-r15)
-
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-
-endif()
-
-
-
-add_executable(${PROJECT_NAME} ${SourceFiles})
+add_subdirectory(test)

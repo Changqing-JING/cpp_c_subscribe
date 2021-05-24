@@ -6,7 +6,7 @@ asm_file:
 asm_arm:
 	aarch64-linux-gnu-gcc -c -o ${buildDir}/bridge_arm.o ${sourceDir}/bridge_arm.s
 
-dump_x86:
+dump_x86: asm_file
 	objdump -d -M intel ${buildDir}/bridge.o
 
 dump_arm: asm_arm

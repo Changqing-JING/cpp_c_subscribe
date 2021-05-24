@@ -8,7 +8,7 @@ struct ClassMemberFuctionBind{
         This Function uses r15 register on x86_64 to pass argument with assembly code in bridge.
         Every .cpp file which includes this header file must be compiled with argument -ffixed-r15, otherwise the r15 register maybe get corrupt.
     */
-    template<  ReturnType (C1::*function_ptr)(FunctionArgumensts ...args)>
+    template<  ReturnType (ClassName::*function_ptr)(FunctionArgumensts ...args)>
     static ReturnType call(FunctionArgumensts ...args){
     void* pointer;;
 
